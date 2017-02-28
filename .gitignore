@@ -1,0 +1,5 @@
+pcc
+*.o
+
+# Ignore .swp files (vim)
+*.swp
