@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 					output_file_path = argv[i];
 				}
 			} else {
-				output_file_path = arg + 2 * sizeof(char*);
+				output_file_path = arg + 2;
 			}
 			continue;
 		}
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
 			input_file_paths[input_file_count++] = path;
 		}	
 	}
-	
+
 	for(i = 0; i < input_file_count; i++)
 		free(input_file_paths[i]);
 }
