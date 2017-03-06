@@ -12,7 +12,7 @@ CFLAGS  = -Werror -ansi -pedantic
 
 all: pcc
 
-pcc: main.c 
+pcc: main.c error.c argparse.c 
 	$(CC) $< -o $@ 
 
 clean:

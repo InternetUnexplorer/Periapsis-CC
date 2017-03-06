@@ -12,6 +12,7 @@
 #include <errno.h>
 
 #include "error.c"
+#include "argparse.c"
 
 int main(int argc, char **argv) {
 	
@@ -23,45 +24,16 @@ int main(int argc, char **argv) {
 	int do_compile    = 1;   //Compile files to asm?
 	int do_assemble   = 1;   //Assemble files?
 	int do_link       = 1;   //Link files?
-	
-	int accept_opts   = 1;   //Accepting options (or just files)?
-	int continue_err  = 1;   //Continue after argument parsing?
-	int i;
 
-	input_file_paths = (char**) malloc((argc - 1) * sizeof(char*));
-	output_file_path = "a.out";
+	char *msg = "Usage: pcc [options] <files>";	
+	const argparse_opt arg_opts[] = {
+		{"output", "output-file", 'o', 1, "Put the garbage somewhere specific"},
+		{"verbose", "verbose", 'v', 0, "Be loud and obnoxious"},
+		{"unsafe-math", "unsafe-math", '\0', 0, "Go fast (and probably segfault)"},
+		{"quiet", NULL, 'q', 0, "Silence is golden"},
+		{"pedantic", "", 'p', 0, "Be annoying about stuff"}
 
-	for(i = 1; i < argc; i++) {
-		char *arg = argv[i];
-		if(accept_opts && !strncmp("--", arg, 2)) {
-			if(!strcmp("--", arg)) {
-				accept_opts = 0;
-			} else { 
-				continue_err = errmsg(0, "Unknown argument ‘%s’", arg);
-			}
-			continue;
-		}
-		if(!strncmp("-o", arg, 2)) {
-			if(!strcmp("-o", arg)) {
-				if(++i == argc) {
-					continue_err = errmsg(0, "-o: Filename expected");
-				} else {
-					output_file_path = argv[i];
-				}
-			} else {
-				output_file_path = arg + 2;
-			}
-			continue;
-		}
-		char *path = realpath(arg, NULL);
-		if(path == NULL) {
-			errmsg(errno, arg);
-			continue_err = 0;
-		} else {
-			input_file_paths[input_file_count++] = path;
-		}	
-	}
-
-	for(i = 0; i < input_file_count; i++)
-		free(input_file_paths[i]);
+	};
+	int arg_optc = sizeof(arg_opts) / sizeof(arg_opts[0]);
+	argparse_printhelp(msg, arg_optc, (argparse_opt*) arg_opts); 
 }
