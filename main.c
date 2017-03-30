@@ -24,16 +24,6 @@ int main(int argc, char **argv) {
 	int do_compile    = 1;   //Compile files to asm?
 	int do_assemble   = 1;   //Assemble files?
 	int do_link       = 1;   //Link files?
-
-	char *msg = "Usage: pcc [options] <files>";	
-	const argparse_opt arg_opts[] = {
-		{"output", "output-file", 'o', 1, "Put the garbage somewhere specific"},
-		{"verbose", "verbose", 'v', 0, "Be loud and obnoxious"},
-		{"unsafe-math", "unsafe-math", '\0', 0, "Go fast (and probably segfault)"},
-		{"quiet", NULL, 'q', 0, "Silence is golden"},
-		{"pedantic", "", 'p', 0, "Be annoying about stuff"}
-
-	};
-	int arg_optc = sizeof(arg_opts) / sizeof(arg_opts[0]);
-	argparse_printhelp(msg, arg_optc, (argparse_opt*) arg_opts); 
+	
+	//Argument parsing will go here.
 }
