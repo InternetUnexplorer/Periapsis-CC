@@ -57,24 +57,26 @@ struct argp_res {
  */
 struct argp_res argp_parse(int argc, char **argv, struct argp_opt *opts);
 
-/* Determines if an option was found in an argp_res based on its
- * lopt value (long option).
+/* Finds an option based on its lopt value (long option), and
+ * returns its argument, if any.
  *   lopt - Long option value to check for
  *   res  - Parse result to check in
- * Returns 1 if the option is present, 0 if it is not.
+ * Returns the argument (' ' if the option does not take an
+ * argument) if the option is present, otherwise NULL.
  */
-int argp_haslopt(char *lopt, struct argp_res res);
+char *argp_getlopt(char *lopt, struct argp_res res);
 
-/* Determines if an option was found in an argp_res based on its
- * sopt value (short option).
+/* Finds an option based on its sopt value (short option), and
+ * returns its argument, if any.
  *   sopt - Short option value to check for
  *   res  - Parse result to check in
- * Returns 1 if the option is present, 0 if it is not.
+ * Returns the argument (' ' if the option does not take an
+ * argument) if the option is present, otherwise NULL.
  */
-int argp_hassopt(char sopt, struct argp_res res);
+char *argp_getsopt(char sopt, struct argp_res res);
 
 /* Pretty-prints formatted help for a list of argp_opts.
- *   opts - Options to print help for
+ *   opts - List of options to print help for
  */
 void argp_printhelp(struct argp_opt *opts);
 
