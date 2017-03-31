@@ -6,6 +6,9 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 
+#ifndef ARGP_H_
+#define ARGP_H_
+
 /* Represents an option that can be passed on the command line.
  *   lopt - Long option
  *   sopt - Short option
@@ -45,3 +48,34 @@ struct argp_res {
 	int    argc;
 	char **argv;
 }
+
+/* Parses a list of command line arguments for argp_opts.
+ *   argc - The number of arguments to parse
+ *   argv - List of arguments to parse
+ *   opts - Options to look for when parsing
+ * Returns either an argp_res on success, or NULL on error.
+ */
+struct argp_res argp_parse(int argc, char **argv, struct argp_opt *opts);
+
+/* Determines if an option was found in an argp_res based on its
+ * lopt value (long option).
+ *   lopt - Long option value to check for
+ *   res  - Parse result to check in
+ * Returns 1 if the option is present, 0 if it is not.
+ */
+int argp_haslopt(char *lopt, struct argp_res res);
+
+/* Determines if an option was found in an argp_res based on its
+ * sopt value (short option).
+ *   sopt - Short option value to check for
+ *   res  - Parse result to check in
+ * Returns 1 if the option is present, 0 if it is not.
+ */
+int argp_hassopt(char sopt, struct argp_res res);
+
+/* Pretty-prints formatted help for a list of argp_opts.
+ *   opts - Options to print help for
+ */
+void argp_printhelp(struct argp_opt *opts);
+
+#endif
