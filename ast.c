@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static AstNode *_ast_new(AstNodeType type) {
+static AstNode *_new(AstNodeType type) {
     AstNode *node = (AstNode*) malloc(sizeof(AstNode));
     if (node != NULL)
         node->type = type;
@@ -11,21 +11,21 @@ static AstNode *_ast_new(AstNodeType type) {
 }
 
 AstNode *ast_l_int(int int_val) {
-    AstNode *node = _ast_new(AST_L_INT);
+    AstNode *node = _new(AST_L_INT);
     if (node != NULL)
         node->int_val = int_val;
     return node;
 }
 
 AstNode *ast_ident(char* ident) {
-    AstNode *node = _ast_new(AST_IDENT);
+    AstNode *node = _new(AST_IDENT);
     if (node != NULL)
         node->ident = ident;
     return node;
 }
 
 AstNode *ast_binop(char op, AstNode *lhs, AstNode *rhs) {
-    AstNode *node = _ast_new(AST_BINOP);
+    AstNode *node = _new(AST_BINOP);
     if (node != NULL) {
         node->op = op;
         node->rhs = rhs;
