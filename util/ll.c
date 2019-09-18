@@ -56,6 +56,14 @@ size_t ll_len(LL *list) {
     return len;
 }
 
+void *ll_get(LL *list, size_t index) {
+    return _getnode(list, index)->item;
+}
+
+void ll_set(LL *list, size_t index, void *item) {
+    _getnode(list, index)->item = item;
+}
+
 void *ll_head(LL *list) {
     LLNode *head = list->head;
     return head != NULL ? head->item : NULL;

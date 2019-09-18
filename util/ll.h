@@ -17,6 +17,9 @@ void ll_free(LL*);
 void ll_clear(LL*);
 size_t ll_len(LL*);
 
+void *ll_get(LL*, size_t);
+void ll_set(LL*, size_t, void*);
+
 void *ll_head(LL*);
 void *ll_tail(LL*);
 
