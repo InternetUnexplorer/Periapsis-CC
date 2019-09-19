@@ -8,17 +8,6 @@ static bool _resize(Vec *vec, size_t capacity) {
     return vec->items != NULL;
 }
 
-static bool _shrink(Vec *vec) {
-    size_t capacity = vec->capacity / 4;
-    return _resize(vec, capacity);
-}
-
-static bool _grow(Vec *vec) {
-    size_t capacity = vec->capacity != 0 ? vec->capacity * 2 : 2;
-    return _resize(vec, capacity);
-}
-
-
 Vec *vec_new(void) {
     Vec *vec = (Vec*) malloc(sizeof(Vec));
     if (vec != NULL) {
@@ -35,8 +24,7 @@ void vec_free(Vec* vec) {
 }
 
 void vec_clear(Vec* vec) {
-    for (size_t i = 0; i < vec->length; i++)
-        free(vec->items[i]);
+    _resize(vec, 0);
 }
 
 size_t vec_len(Vec* vec) {
@@ -52,21 +40,22 @@ void vec_set(Vec *vec, size_t index, void *item) {
 }
 
 void vec_insert(Vec* vec, size_t index, void* item) {
-    if (vec->length < vec->capacity || _grow(vec)) {
-        for (size_t i = vec->length; i > index; i--)
-            vec->items[i] = vec->items[i - 1];
-        vec->items[index] = item;
-        vec->length++;
-    }
+    if (vec->length == vec->capacity)
+        if (!_resize(vec, vec->capacity != 0 ? vec->capacity * 2 : 2))
+            return;
+    for (size_t i = vec->length; i > index; i--)
+        vec->items[i] = vec->items[i - 1];
+    vec->items[index] = item;
+    vec->length++;
 }
 
 void *vec_remove(Vec *vec, size_t index) {
     void *item = vec->items[index];
+    vec->length--;
     for (size_t i = index; i < vec->length; i++)
         vec->items[i] = vec->items[i + 1];
     if (vec->length < vec->capacity / 4)
-        _shrink(vec);
-    vec->length--;
+        _resize(vec, vec->capacity / 2);
     return item;
 }
 
