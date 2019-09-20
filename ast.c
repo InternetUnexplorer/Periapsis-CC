@@ -52,7 +52,7 @@ void ast_free(AstNode *node) {
     free(node);
 }
 
-static void _ast_printf(AstNode *node, int indent) {
+static void _printf(AstNode *node, int indent) {
     printf("AstNode {\n");
     indent += 4;
     switch (node->type) {
@@ -68,9 +68,9 @@ static void _ast_printf(AstNode *node, int indent) {
             printf("%*stype = AST_BINOP\n", indent, "");
             printf("%*sop = '%c'\n", indent, "", node->op);
             printf("%*slhs = ", indent, "");
-            _ast_printf(node->lhs, indent);
+            _printf(node->lhs, indent);
             printf("%*srhs = ", indent, "");
-            _ast_printf(node->rhs, indent);
+            _printf(node->rhs, indent);
             break;
         default:
             printf("%*stype = <unknown>\n", indent, "");
@@ -81,5 +81,5 @@ static void _ast_printf(AstNode *node, int indent) {
 }
 
 void ast_printf(AstNode *node) {
-    _ast_printf(node, 0);
+    _printf(node, 0);
 }
