@@ -13,22 +13,22 @@ typedef struct LLNode {
 } LLNode;
 
 LL *ll_new(void);
-void ll_free(LL*);
-void ll_clear(LL*);
-size_t ll_len(LL*);
+void ll_free(LL *list);
+void ll_clear(LL *list);
+size_t ll_len(LL *list);
 
-void *ll_get(LL*, size_t);
-void ll_set(LL*, size_t, void*);
+void *ll_get(LL *list, size_t index);
+void ll_set(LL *list, size_t index, void *item);
 
-void *ll_head(LL*);
-void *ll_tail(LL*);
+void *ll_head(LL *list);
+void *ll_tail(LL *list);
 
-void ll_insert(LL*, size_t, void*);
-void *ll_remove(LL*, size_t);
+void ll_insert(LL *list, size_t index, void *item);
+void *ll_remove(LL *list, size_t index);
 
-void ll_pushf(LL*, void*);
-void ll_pushb(LL*, void*);
-void *ll_popf(LL*);
-void *ll_popb(LL*);
+void ll_pushf(LL *list, void *item);
+void ll_pushb(LL *list, void *item);
+void *ll_popf(LL *list);
+void *ll_popb(LL *list);
 
 #endif

@@ -9,7 +9,7 @@ static bool _resize(Vec *vec, size_t capacity) {
     return vec->items != NULL;
 }
 
-Vec *vec_new(void) {
+Vec *vec_new() {
     Vec *vec = (Vec*) malloc(sizeof(Vec));
     if (vec != NULL) {
         vec->length = 0;

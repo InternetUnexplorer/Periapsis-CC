@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-void yyerror(yyscan_t*, AstNode**, char*);
+void yyerror(yyscan_t *scanner, AstNode **root, char *err);
 %}
 
 %output  "parser.c"
@@ -53,7 +53,7 @@ statement
     ;
 %%
 
-void yyerror(yyscan_t *loc, AstNode **node, char *err) {
+void yyerror(yyscan_t *scanner, AstNode **root, char *err) {
     fprintf(stderr, "error: %s\n", err);
 }
 

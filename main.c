@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 
-int main(void) {
+int main() {
     AstNode *root = parse_stdin();
     if (root != NULL)
         ast_printf(root);

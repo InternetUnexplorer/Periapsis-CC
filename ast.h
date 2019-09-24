@@ -17,11 +17,11 @@ typedef struct AstNode {
     };
 } AstNode;
 
-AstNode *ast_l_int(int);
-AstNode *ast_ident(char*);
-AstNode *ast_binop(char, AstNode*, AstNode*);
+AstNode *ast_l_int(int int_val);
+AstNode *ast_ident(char *ident);
+AstNode *ast_binop(char op, AstNode *lhs, AstNode *rhs);
 
-void ast_free(AstNode*);
-void ast_printf(AstNode*);
+void ast_free(AstNode *node);
+void ast_printf(AstNode *node);
 
 #endif
