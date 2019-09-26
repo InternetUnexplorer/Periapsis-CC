@@ -1,12 +1,11 @@
 #include "ast.h"
+#include "util/alloc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #define _AST_MALLOC(NAME, TYPE)                                                \
-    TYPE *node = (TYPE *) malloc(sizeof(TYPE));                                \
-    if (node == NULL)                                                          \
-        return NULL;                                                           \
+    TYPE *node = MALLOC(TYPE);                                                 \
     node->type = NAME;
 
 #define _AST_FREE_NODE(TYPE, FIELD) ast_free((AstNode *) ((TYPE *) node)->FIELD)

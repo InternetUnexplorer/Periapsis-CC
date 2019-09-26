@@ -1,28 +1,24 @@
 #include "vec.h"
+#include "alloc.h"
 
-#include <stdbool.h>
 #include <string.h>
 
-static bool _resize(Vec *vec, size_t capacity) {
-    if ((vec->items = realloc(vec->items, capacity * sizeof(void*))) != NULL)
-        vec->capacity = capacity;
-    return vec->items != NULL;
+static void _resize(Vec *vec, size_t capacity) {
+    vec->items = checked_realloc(vec->items, capacity * sizeof(void *));
+    vec->capacity = capacity;
 }
 
 Vec *vec_new() {
-    Vec *vec = (Vec*) malloc(sizeof(Vec));
-    if (vec != NULL) {
-        vec->length = 0;
-        vec->capacity = 0;
-        vec->items = NULL;
-    }
+    Vec *vec = MALLOC(Vec);
+    vec->length = 0;
+    vec->capacity = 0;
+    vec->items = NULL;
     return vec;
 }
 
 Vec *vec_from(void *item) {
     Vec *vec = vec_new();
-    if (vec != NULL)
-        vec_pushf(vec, item);
+    vec_pushf(vec, item);
     return vec;
 }
 
@@ -37,43 +33,32 @@ void vec_clear(Vec *vec) {
     _resize(vec, 2);
 }
 
-size_t vec_len(Vec *vec) {
-    return vec->length;
-}
+size_t vec_len(Vec *vec) { return vec->length; }
 
-void *vec_get(Vec *vec, size_t index) {
-    return vec->items[index];
-}
+void *vec_get(Vec *vec, size_t index) { return vec->items[index]; }
 
-void vec_set(Vec *vec, size_t index, void *item) {
-    vec->items[index] = item;
-}
+void vec_set(Vec *vec, size_t index, void *item) { vec->items[index] = item; }
 
 void vec_insert(Vec *vec, size_t index, void *item) {
     if (vec->length == vec->capacity)
-        if (!_resize(vec, vec->capacity != 0 ? vec->capacity * 2 : 2))
-            return;
+        _resize(vec, vec->capacity != 0 ? vec->capacity * 2 : 2);
     memmove(&vec->items[index + 1], &vec->items[index],
-            (vec->length++ - index) * sizeof(void*));
+            (vec->length++ - index) * sizeof(void *));
     vec->items[index] = item;
 }
 
 void *vec_remove(Vec *vec, size_t index) {
     void *item = vec->items[index];
     memmove(&vec->items[index], &vec->items[index + 1],
-            (--vec->length - index) * sizeof(void*));
+            (--vec->length - index) * sizeof(void *));
     if (vec->length < vec->capacity / 4)
         _resize(vec, vec->capacity / 2);
     return item;
 }
 
-void vec_pushf(Vec *vec, void *item) {
-    vec_insert(vec, 0, item);
-}
+void vec_pushf(Vec *vec, void *item) { vec_insert(vec, 0, item); }
 
-void vec_pushb(Vec *vec, void *item) {
-    vec_insert(vec, vec->length, item);
-}
+void vec_pushb(Vec *vec, void *item) { vec_insert(vec, vec->length, item); }
 
 void *vec_popf(Vec *vec) {
     return vec->length != 0 ? vec_remove(vec, 0) : NULL;

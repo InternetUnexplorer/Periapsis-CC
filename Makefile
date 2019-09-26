@@ -2,7 +2,7 @@ CC_FLAGS    := $(CC_FLAGS) -Wall -g
 FLEX_FLAGS  := $(FLEX_FLAGS)
 BISON_FLAGS := $(BISON_FLAGS)
 
-C_FILES = main.c util/ll.c util/vec.c ast.c lexer.c parser.c
+C_FILES = main.c util/alloc.c util/ll.c util/vec.c ast.c lexer.c parser.c
 
 .PHONY: clean
 

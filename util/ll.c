@@ -1,11 +1,10 @@
 #include "ll.h"
+#include "alloc.h"
 
 static LLNode *_newnode(void *item) {
-    LLNode *node = (LLNode*) malloc(sizeof(LLNode));
-    if (node != NULL) {
-        node->item = item;
-        node->next = NULL;
-    }
+    LLNode *node = MALLOC(LLNode);
+    node->item = item;
+    node->next = NULL;
     return node;
 }
 
@@ -31,16 +30,14 @@ static void *_unwrap(LLNode *node) {
 }
 
 LL *ll_new() {
-    LL *list = (LL*) malloc(sizeof(LL));
-    if (list != NULL)
-        list->head = NULL;
+    LL *list = MALLOC(LL);
+    list->head = NULL;
     return list;
 }
 
 LL *ll_from(void *item) {
     LL *list = ll_new();
-    if (list != NULL)
-        ll_pushf(list, item);
+    ll_pushf(list, item);
     return list;
 }
 
@@ -62,9 +59,7 @@ size_t ll_len(LL *list) {
     return len;
 }
 
-void *ll_get(LL *list, size_t index) {
-    return _getnode(list, index)->item;
-}
+void *ll_get(LL *list, size_t index) { return _getnode(list, index)->item; }
 
 void ll_set(LL *list, size_t index, void *item) {
     _getnode(list, index)->item = item;
