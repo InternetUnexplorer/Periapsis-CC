@@ -9,6 +9,7 @@ typedef struct Vec {
 } Vec;
 
 Vec *vec_new(void);
+Vec *vec_from(void *item);
 void vec_free(Vec *vec);
 void vec_clear(Vec *vec);
 size_t vec_len(Vec *vec);

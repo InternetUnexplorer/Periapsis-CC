@@ -13,6 +13,7 @@ typedef struct LLNode {
 } LLNode;
 
 LL *ll_new(void);
+LL *ll_from(void *item);
 void ll_free(LL *list);
 void ll_clear(LL *list);
 size_t ll_len(LL *list);

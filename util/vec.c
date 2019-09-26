@@ -19,6 +19,13 @@ Vec *vec_new() {
     return vec;
 }
 
+Vec *vec_from(void *item) {
+    Vec *vec = vec_new();
+    if (vec != NULL)
+        vec_pushf(vec, item);
+    return vec;
+}
+
 void vec_free(Vec *vec) {
     vec_clear(vec);
     free(vec);

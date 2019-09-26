@@ -30,11 +30,17 @@ static void *_unwrap(LLNode *node) {
     return item;
 }
 
-
 LL *ll_new() {
     LL *list = (LL*) malloc(sizeof(LL));
     if (list != NULL)
         list->head = NULL;
+    return list;
+}
+
+LL *ll_from(void *item) {
+    LL *list = ll_new();
+    if (list != NULL)
+        ll_pushf(list, item);
     return list;
 }
 
