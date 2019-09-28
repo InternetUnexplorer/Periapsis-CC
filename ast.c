@@ -85,15 +85,15 @@ AstNode *ast_binop(Binop op, AstNode *lhs, AstNode *rhs) {
     return (AstNode *) node;
 }
 
-AstNode *ast_decl_list(DeclSpecs specs, Vec *decls) {
-    _AST_MALLOC(AST_DECL_LIST, AstDeclListNode);
+AstNode *ast_decl_stmt(DeclSpecs specs, Vec *decls) {
+    _AST_MALLOC(AST_DECL_STMT, AstDeclStmtNode);
     node->specs = specs;
     node->decls = decls;
     return (AstNode *) node;
 }
 
-AstNode *ast_decl(AstNode *ident, AstNode *value) {
-    _AST_MALLOC(AST_DECL, AstDeclNode);
+AstNode *ast_var_decl(AstNode *ident, AstNode *value) {
+    _AST_MALLOC(AST_VAR_DECL, AstVarDeclNode);
     node->ident = ident;
     node->value = value;
     return (AstNode *) node;
@@ -143,6 +143,21 @@ AstNode *ast_for_stmt(AstNode *init_expr, AstNode *cond_expr,
     return (AstNode *) node;
 }
 
+AstNode *ast_fn_decl(AstNode *ident, Vec *params, AstNode *body) {
+    _AST_MALLOC(AST_FN_DECL, AstFnDeclNode);
+    node->ident = ident;
+    node->params = params;
+    node->body = body;
+    return (AstNode *) node;
+}
+
+AstNode *ast_param_decl(DeclSpecs specs, AstNode *ident) {
+    _AST_MALLOC(AST_PARAM_DECL, AstParamDeclNode);
+    node->specs = specs;
+    node->ident = ident;
+    return (AstNode *) node;
+}
+
 AstNode *ast_trans_unit(Vec *decls) {
     _AST_MALLOC(AST_TRANS_UNIT, AstTransUnitNode);
     node->decls = decls;
@@ -156,7 +171,6 @@ void ast_free(AstNode *node) {
     case AST_IDENT:
     case AST_I_CONST:
     case AST_F_CONST:
-    case AST_STR_LIT:
         break;
     case AST_FN_CALL:
         _AST_FREE_NODE(AstFnCallNode, fn);
@@ -169,12 +183,12 @@ void ast_free(AstNode *node) {
         _AST_FREE_NODE(AstBinopNode, lhs);
         _AST_FREE_NODE(AstBinopNode, rhs);
         break;
-    case AST_DECL_LIST:
-        _AST_FREE_NODE_VEC(AstDeclListNode, decls);
+    case AST_DECL_STMT:
+        _AST_FREE_NODE_VEC(AstDeclStmtNode, decls);
         break;
-    case AST_DECL:
-        _AST_FREE_NODE(AstDeclNode, ident);
-        _AST_FREE_NODE(AstDeclNode, value);
+    case AST_VAR_DECL:
+        _AST_FREE_NODE(AstVarDeclNode, ident);
+        _AST_FREE_NODE(AstVarDeclNode, value);
         break;
     case AST_EXPR_STMT:
         _AST_FREE_NODE(AstExprStmtNode, expr);
@@ -200,6 +214,14 @@ void ast_free(AstNode *node) {
         _AST_FREE_NODE(AstForStmtNode, cond_expr);
         _AST_FREE_NODE(AstForStmtNode, incr_expr);
         _AST_FREE_NODE(AstForStmtNode, stmt);
+        break;
+    case AST_FN_DECL:
+        _AST_FREE_NODE(AstFnDeclNode, ident);
+        _AST_FREE_NODE_VEC(AstFnDeclNode, params);
+        _AST_FREE_NODE(AstFnDeclNode, body);
+        break;
+    case AST_PARAM_DECL:
+        _AST_FREE_NODE(AstParamDeclNode, ident);
         break;
     case AST_TRANS_UNIT:
         _AST_FREE_NODE_VEC(AstTransUnitNode, decls);
@@ -236,22 +258,24 @@ static void _printf(AstNode *node, int indent) {
         break;
     case AST_UNOP:
         _AST_PRINTF_TYPE(AST_UNOP);
+        _AST_PRINTF_FIELD(AstUnopNode, op, "0x%02X");
         _AST_PRINTF_NODE(AstUnopNode, node);
         break;
     case AST_BINOP:
         _AST_PRINTF_TYPE(AST_BINOP);
+        _AST_PRINTF_FIELD(AstBinopNode, op, "0x%02X");
         _AST_PRINTF_NODE(AstBinopNode, lhs);
         _AST_PRINTF_NODE(AstBinopNode, rhs);
         break;
-    case AST_DECL_LIST:
-        _AST_PRINTF_TYPE(AST_DECL_LIST);
-        _AST_PRINTF_FIELD(AstDeclListNode, specs, "0x%02X");
-        _AST_PRINTF_NODE_VEC(AstDeclListNode, decls);
+    case AST_DECL_STMT:
+        _AST_PRINTF_TYPE(AST_DECL_STMT);
+        _AST_PRINTF_FIELD(AstDeclStmtNode, specs, "0x%02X");
+        _AST_PRINTF_NODE_VEC(AstDeclStmtNode, decls);
         break;
-    case AST_DECL:
-        _AST_PRINTF_TYPE(AST_DECL);
-        _AST_PRINTF_NODE(AstDeclNode, ident);
-        _AST_PRINTF_NODE(AstDeclNode, value);
+    case AST_VAR_DECL:
+        _AST_PRINTF_TYPE(AST_VAR_DECL);
+        _AST_PRINTF_NODE(AstVarDeclNode, ident);
+        _AST_PRINTF_NODE(AstVarDeclNode, value);
         break;
     case AST_EXPR_STMT:
         _AST_PRINTF_TYPE(AST_EXPR_STMT);
@@ -283,6 +307,17 @@ static void _printf(AstNode *node, int indent) {
         _AST_PRINTF_NODE(AstForStmtNode, cond_expr);
         _AST_PRINTF_NODE(AstForStmtNode, incr_expr);
         _AST_PRINTF_NODE(AstForStmtNode, stmt);
+        break;
+    case AST_FN_DECL:
+        _AST_PRINTF_TYPE(AST_FN_DECL);
+        _AST_PRINTF_NODE(AstFnDeclNode, ident);
+        _AST_PRINTF_NODE_VEC(AstFnDeclNode, params);
+        _AST_PRINTF_NODE(AstFnDeclNode, body);
+        break;
+    case AST_PARAM_DECL:
+        _AST_PRINTF_TYPE(AST_PARAM_DECL);
+        _AST_PRINTF_FIELD(AstParamDeclNode, specs, "0x%02X");
+        _AST_PRINTF_NODE(AstParamDeclNode, ident);
         break;
     case AST_TRANS_UNIT:
         _AST_PRINTF_TYPE(AST_TRANS_UNIT);

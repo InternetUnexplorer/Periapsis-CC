@@ -9,18 +9,19 @@ typedef enum AstNodeType {
     AST_IDENT,         // Identifier
     AST_I_CONST,       // Integer constant
     AST_F_CONST,       // Floating-point constant
-    AST_STR_LIT,       // String literal
     AST_FN_CALL,       // Function call
     AST_UNOP,          // Unary operation
     AST_BINOP,         // Binary operation
-    AST_DECL_LIST,     // Declaration list
-    AST_DECL,          // Declaration
+    AST_DECL_STMT,     // Declaration statement
+    AST_VAR_DECL,      // Variable declaration
     AST_EXPR_STMT,     // Expression statement
     AST_CMPD_STMT,     // Compound statement
     AST_IF_ELSE_STMT,  // If-else statement
     AST_WHILE_STMT,    // While statement
     AST_DO_WHILE_STMT, // Do-while statement
     AST_FOR_STMT,      // For statement
+    AST_FN_DECL,       // Function declaration
+    AST_PARAM_DECL,    // Parameter declaration
     AST_TRANS_UNIT,    // Translation unit
 } AstNodeType;
 
@@ -61,17 +62,16 @@ typedef struct AstBinopNode {
     AstNode *lhs, *rhs;
 } AstBinopNode;
 
-typedef struct AstDeclListNode {
+typedef struct AstDeclStmtNode {
     AstNodeType type;
     DeclSpecs specs;
     Vec *decls;
-} AstDeclListNode;
+} AstDeclStmtNode;
 
-typedef struct AstDeclNode {
+typedef struct AstVarDeclNode {
     AstNodeType type;
-    AstNode *ident;
-    AstNode *value;
-} AstDeclNode;
+    AstNode *ident, *value;
+} AstVarDeclNode;
 
 typedef struct AstExprStmtNode {
     AstNodeType type;
@@ -103,6 +103,19 @@ typedef struct AstForStmtNode {
     AstNode *init_expr, *cond_expr, *incr_expr, *stmt;
 } AstForStmtNode;
 
+typedef struct AstFnDeclNode {
+    AstNodeType type;
+    AstNode *ident;
+    Vec *params;
+    AstNode *body;
+} AstFnDeclNode;
+
+typedef struct AstParamDeclNode {
+    AstNodeType type;
+    DeclSpecs specs;
+    AstNode *ident;
+} AstParamDeclNode;
+
 typedef struct AstTransUnitNode {
     AstNodeType type;
     Vec *decls;
@@ -114,8 +127,8 @@ AstNode *ast_f_const(double fconst);
 AstNode *ast_fn_call(AstNode *fn, Vec *args);
 AstNode *ast_unop(Unop op, AstNode *node);
 AstNode *ast_binop(Binop op, AstNode *lhs, AstNode *rhs);
-AstNode *ast_decl_list(DeclSpecs specs, Vec *decls);
-AstNode *ast_decl(AstNode *ident, AstNode *value);
+AstNode *ast_decl_stmt(DeclSpecs specs, Vec *decls);
+AstNode *ast_var_decl(AstNode *ident, AstNode *value);
 AstNode *ast_expr_stmt(AstNode *expr);
 AstNode *ast_cmpd_stmt(Vec *stmts);
 AstNode *ast_if_else_stmt(AstNode *expr, AstNode *if_stmt, AstNode *else_stmt);
@@ -123,6 +136,8 @@ AstNode *ast_while_stmt(AstNode *expr, AstNode *stmt);
 AstNode *ast_do_while_stmt(AstNode *expr, AstNode *stmt);
 AstNode *ast_for_stmt(AstNode *init_expr, AstNode *cond_expr,
                       AstNode *incr_expr, AstNode *stmt);
+AstNode *ast_fn_decl(AstNode *ident, Vec *params, AstNode *body);
+AstNode *ast_param_decl(DeclSpecs specs, AstNode *ident);
 AstNode *ast_trans_unit(Vec *decls);
 
 void ast_free(AstNode *node);
