@@ -1,7 +1,7 @@
 #ifndef DECL_H
 #define DECL_H
 
-#include <stdlib.h>
+#include <stdint.h>
 
 typedef enum DeclSpec {
     DECL_SPEC_NONE = 0x0,
@@ -12,6 +12,6 @@ typedef enum DeclSpec {
     DECL_SPEC_VOID = 0x10,
 } DeclSpec;
 
-typedef size_t DeclSpecs;
+typedef uint16_t DeclSpecs;
 
 #endif
