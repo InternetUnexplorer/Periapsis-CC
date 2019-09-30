@@ -32,8 +32,8 @@ AstNode *parse_stdin();
 %type <AstNode*> constant primary_expr postfix_expr unary_expr mult_expr
 %type <AstNode*> add_expr rel_expr eq_expr and_expr xor_expr or_expr l_and_expr
 %type <AstNode*> l_or_expr assignment_expr expr decl_stmt var_decl cmpd_stmt
-%type <AstNode*> block_item expr_stmt selection_stmt iteration_stmt stmt
-%type <AstNode*> fn_decl fn_param extern_decl trans_unit
+%type <AstNode*> block_item expr_stmt selection_stmt iteration_stmt jump_stmt
+%type <AstNode*> stmt fn_decl fn_param extern_decl trans_unit
 
 %type <Vec*> fn_args var_decls block_items fn_params extern_decls
 %type <DeclSpecs> decl_specs
@@ -220,11 +220,17 @@ iteration_stmt
     }
     ;
 
+jump_stmt
+    : RETURN ';'                        { $$ = ast_return_stmt(NULL); }
+    | RETURN expr ';'                   { $$ = ast_return_stmt($2);   }
+    ;
+
 stmt
     : cmpd_stmt
     | expr_stmt
     | selection_stmt
     | iteration_stmt
+    | jump_stmt
     ;
 
 fn_decl

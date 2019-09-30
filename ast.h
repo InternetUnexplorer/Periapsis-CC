@@ -20,6 +20,7 @@ typedef enum AstNodeType {
     AST_WHILE_STMT,    // While statement
     AST_DO_WHILE_STMT, // Do-while statement
     AST_FOR_STMT,      // For statement
+    AST_RETURN_STMT,   // Return statement
     AST_FN_DECL,       // Function declaration
     AST_PARAM_DECL,    // Parameter declaration
     AST_TRANS_UNIT,    // Translation unit
@@ -103,6 +104,11 @@ typedef struct AstForStmtNode {
     AstNode *init_expr, *cond_expr, *incr_expr, *stmt;
 } AstForStmtNode;
 
+typedef struct AstReturnStmtNode {
+    AstNodeType type;
+    AstNode *expr;
+} AstReturnStmtNode;
+
 typedef struct AstFnDeclNode {
     AstNodeType type;
     AstNode *ident;
@@ -136,6 +142,7 @@ AstNode *ast_while_stmt(AstNode *expr, AstNode *stmt);
 AstNode *ast_do_while_stmt(AstNode *expr, AstNode *stmt);
 AstNode *ast_for_stmt(AstNode *init_expr, AstNode *cond_expr,
                       AstNode *incr_expr, AstNode *stmt);
+AstNode *ast_return_stmt(AstNode *expr);
 AstNode *ast_fn_decl(AstNode *ident, Vec *params, AstNode *body);
 AstNode *ast_param_decl(DeclSpecs specs, AstNode *ident);
 AstNode *ast_trans_unit(Vec *decls);

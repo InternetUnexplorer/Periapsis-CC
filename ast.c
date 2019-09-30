@@ -143,6 +143,12 @@ AstNode *ast_for_stmt(AstNode *init_expr, AstNode *cond_expr,
     return (AstNode *) node;
 }
 
+AstNode *ast_return_stmt(AstNode *expr) {
+    _AST_MALLOC(AST_RETURN_STMT, AstReturnStmtNode);
+    node->expr = expr;
+    return (AstNode *) node;
+}
+
 AstNode *ast_fn_decl(AstNode *ident, Vec *params, AstNode *body) {
     _AST_MALLOC(AST_FN_DECL, AstFnDeclNode);
     node->ident = ident;
@@ -214,6 +220,9 @@ void ast_free(AstNode *node) {
         _AST_FREE_NODE(AstForStmtNode, cond_expr);
         _AST_FREE_NODE(AstForStmtNode, incr_expr);
         _AST_FREE_NODE(AstForStmtNode, stmt);
+        break;
+    case AST_RETURN_STMT:
+        _AST_FREE_NODE(AstReturnStmtNode, expr);
         break;
     case AST_FN_DECL:
         _AST_FREE_NODE(AstFnDeclNode, ident);
@@ -307,6 +316,10 @@ static void _printf(AstNode *node, int indent) {
         _AST_PRINTF_NODE(AstForStmtNode, cond_expr);
         _AST_PRINTF_NODE(AstForStmtNode, incr_expr);
         _AST_PRINTF_NODE(AstForStmtNode, stmt);
+        break;
+    case AST_RETURN_STMT:
+        _AST_PRINTF_TYPE(AST_RETURN_STMT);
+        _AST_PRINTF_NODE(AstReturnStmtNode, expr);
         break;
     case AST_FN_DECL:
         _AST_PRINTF_TYPE(AST_FN_DECL);
