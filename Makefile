@@ -13,13 +13,17 @@ main: $(OBJ_FILES)
 
 main.o: main.c parser.h
 
+lexer.o: parser.h
+
 %.o: %.c
 	$(strip $(CC) $(CC_FLAGS) -MMD -MP -c $< -o $@)
 
-lexer.c lexer.h: lexer.l
+lexer.h: lexer.c
+lexer.c: lexer.l
 	$(strip flex $(FLEX_FLAGS) $<)
 
-parser.c parser.h: parser.y ast.h lexer.h
+parser.h: parser.c
+parser.c: parser.y lexer.h
 	$(strip bison $(BISON_FLAGS) $<)
 
 clean:
