@@ -344,4 +344,6 @@ static void _printf(AstNode *node, int indent) {
     printf("%*s}\n", indent, "");
 }
 
-void ast_printf(AstNode *node) { _printf(node, 0); }
+void ast_printf(AstNode *node) {
+    _printf(node, 0);
+}
