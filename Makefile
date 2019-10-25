@@ -2,7 +2,7 @@ CC_FLAGS    := $(CC_FLAGS) -Wall -g
 FLEX_FLAGS  := $(FLEX_FLAGS)
 BISON_FLAGS := $(BISON_FLAGS)
 
-SRC_FILES = main.c util/alloc.c util/ll.c util/strbuf.c util/vec.c ast.c lexer.c parser.c type.c
+SRC_FILES = main.c util/alloc.c util/ll.c util/strbuf.c util/vec.c ast.c decl_spec.c lexer.c parser.c type.c
 
 OBJ_FILES = $(SRC_FILES:.c=.o)
 DEP_FILES = $(SRC_FILES:.c=.d)
