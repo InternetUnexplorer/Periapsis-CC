@@ -8,7 +8,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-static void yyerror(yyscan_t *scanner, ParserState *state, char *format, ...);
+static void yyerror(yyscan_t *scanner, ParserState *state, const char *format,
+                    ...);
 %}
 
 %output  "parser.c"
@@ -16,6 +17,9 @@ static void yyerror(yyscan_t *scanner, ParserState *state, char *format, ...);
 
 %define api.pure full
 %define api.value.type union
+
+%define parse.lac full
+%define parse.error verbose
 
 %code requires {
 #define error(...)                                                             \
@@ -293,7 +297,8 @@ extern_decl
     ;
 %%
 
-static void yyerror(yyscan_t *scanner, ParserState *state, char *format, ...) {
+static void yyerror(yyscan_t *scanner, ParserState *state, const char *format,
+                    ...) {
     va_list args;
 
     fprintf(stderr, "\033[31;1merror:\033[0m ");
