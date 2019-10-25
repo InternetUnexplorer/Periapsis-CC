@@ -1,11 +1,14 @@
 %{
 #include "ast.h"
+#include "decl_spec.h"
+
 #include "parser.h"
 #include "lexer.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 
-void yyerror(yyscan_t *scanner, AstNode **root, char *err);
+static void yyerror(yyscan_t *scanner, ParserState *state, char *format, ...);
 %}
 
 %output  "parser.c"
@@ -15,13 +18,23 @@ void yyerror(yyscan_t *scanner, AstNode **root, char *err);
 %define api.value.type union
 
 %code requires {
+#define error(...)                                                             \
+    do {                                                                       \
+        yyerror(scanner, state, __VA_ARGS__);                                  \
+        YYERROR;                                                               \
+    } while (0)
+
+typedef struct ParserState {
+    AstNode *ast_root;
+} ParserState;
+
 typedef void *yyscan_t;
+
 AstNode *parse_stdin();
 }
 
-%lex-param   { yyscan_t scanner }
-%parse-param { yyscan_t scanner }
-%parse-param { AstNode **root }
+%param { yyscan_t scanner }
+%parse-param { ParserState *state }
 
 %token <AstNode*> IDENT I_CONST F_CONST
 
@@ -263,7 +276,10 @@ fn_param
     ;
 
 trans_unit
-    : extern_decls                      { $$ = *root = ast_trans_unit($1); }
+    : extern_decls
+    {
+        $$ = state->ast_root = ast_trans_unit($1);
+    }
     ;
 
 extern_decls
@@ -277,20 +293,30 @@ extern_decl
     ;
 %%
 
-void yyerror(yyscan_t *scanner, AstNode **root, char *err) {
-    fprintf(stderr, "error: %s\n", err);
+static void yyerror(yyscan_t *scanner, ParserState *state, char *format, ...) {
+    va_list args;
+
+    fprintf(stderr, "\033[31;1merror:\033[0m ");
+
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+
+    fprintf(stderr, "\n");
 }
 
 AstNode *parse_stdin() {
-    yyscan_t scanner;
-    AstNode *root;
+    ParserState state = {
+        .ast_root = NULL
+    };
 
+    yyscan_t scanner;
     if (yylex_init(&scanner))
         return NULL;
-    if (yyparse(scanner, &root))
+    if (yyparse(scanner, &state))
         return NULL;
 
     yylex_destroy(scanner);
 
-    return root;
+    return state.ast_root;
 }
