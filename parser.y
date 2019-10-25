@@ -173,7 +173,8 @@ decl_specs
             error("duplicate declaration specifier ‘%s’", decl_spec_str($1));
         // Check for conflicting type specifiers
         else if ($1 & DECL_SPEC_TYPE && $2 & DECL_SPEC_TYPE)
-            error("two or more data types in declaration specifiers");
+            error("conflicting types ‘%s’ and ‘%s’ in declaration specifiers",
+                  decl_spec_str($1), decl_spec_str($2 & DECL_SPEC_TYPE));
         // Check for conflicting sign specifiers
         else if ($1 & DECL_SPEC_SIGN && $2 & DECL_SPEC_SIGN)
             error("both ‘signed’ and ‘unsigned’ in declaration specifiers");
