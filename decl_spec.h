@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 typedef enum DeclSpec {
-    DECL_SPEC_NONE = 0x0,
     DECL_SPEC_FLOAT = 0x1,
     DECL_SPEC_INT = 0x2,
     DECL_SPEC_SIGNED = 0x4,
@@ -13,5 +12,7 @@ typedef enum DeclSpec {
 } DeclSpec;
 
 typedef uint16_t DeclSpecs;
+
+const char *decl_spec_str(DeclSpec spec);
 
 #endif
