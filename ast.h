@@ -1,7 +1,7 @@
 #ifndef AST_H
 #define AST_H
 
-#include "decl.h"
+#include "decl_spec.h"
 #include "ops.h"
 #include "util/vec.h"
 
