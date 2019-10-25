@@ -53,8 +53,7 @@ AstNode *parse_stdin();
 %type <AstNode*> stmt fn_decl fn_param extern_decl trans_unit
 
 %type <Vec*> fn_args var_decls block_items fn_params extern_decls
-%type <DeclSpecs> decl_specs
-%type <DeclSpec> decl_spec
+%type <DeclSpecs> decl_spec decl_specs
 
 %expect 1
 
@@ -163,8 +162,30 @@ decl_stmt
     ;
 
 decl_specs
-    : decl_spec                         { $$ = (DeclSpecs) $1; }
-    | decl_spec decl_specs              { $$ = ($1 | $2);      }
+    : decl_spec
+    {
+        $$ = $1;
+    }
+    | decl_spec decl_specs
+    {
+        // Check for duplicate specifiers
+        if ($1 & $2)
+            error("duplicate declaration specifier ‘%s’", decl_spec_str($1));
+        // Check for conflicting type specifiers
+        else if ($1 & DECL_SPEC_TYPE && $2 & DECL_SPEC_TYPE)
+            error("two or more data types in declaration specifiers");
+        // Check for conflicting sign specifiers
+        else if ($1 & DECL_SPEC_SIGN && $2 & DECL_SPEC_SIGN)
+            error("both ‘signed’ and ‘unsigned’ in declaration specifiers");
+        // Check for a sign specifier and a type specifier other than int
+        else if (($1 | $2) & (DECL_SPEC_TYPE & ~DECL_SPEC_INT) &&
+                 ($1 | $2) & DECL_SPEC_SIGN)
+            error("both ‘%s’ and ‘%s’ in declaration specifiers",
+                  decl_spec_str(($1 | $2) & DECL_SPEC_TYPE & ~DECL_SPEC_INT),
+                  decl_spec_str(($1 | $2) & DECL_SPEC_SIGN));
+        else
+            $$ = ($1 | $2);
+    }
     ;
 
 decl_spec

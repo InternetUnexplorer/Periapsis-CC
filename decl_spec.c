@@ -1,6 +1,6 @@
 #include "decl_spec.h"
 
-const char *decl_spec_str(DeclSpec spec) {
+const char *decl_spec_str(DeclSpecs spec) {
     switch (spec) {
     case DECL_SPEC_FLOAT:
         return "float";
