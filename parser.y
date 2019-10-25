@@ -6,7 +6,11 @@
 #include "lexer.h"
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
+
+static bool _check_decl_specs(yyscan_t *scanner, ParserState *state,
+                              DeclSpecs specs, DeclSpecs spec);
 
 static void yyerror(yyscan_t *scanner, ParserState *state, const char *format,
                     ...);
@@ -22,11 +26,7 @@ static void yyerror(yyscan_t *scanner, ParserState *state, const char *format,
 %define parse.error verbose
 
 %code requires {
-#define error(...)                                                             \
-    do {                                                                       \
-        yyerror(scanner, state, __VA_ARGS__);                                  \
-        YYERROR;                                                               \
-    } while (0)
+#define error(...) yyerror(scanner, state, __VA_ARGS__)
 
 typedef struct ParserState {
     AstNode *ast_root;
@@ -166,26 +166,11 @@ decl_specs
     {
         $$ = $1;
     }
-    | decl_spec decl_specs
+    | decl_specs decl_spec
     {
-        // Check for duplicate specifiers
-        if ($1 & $2)
-            error("duplicate declaration specifier ‘%s’", decl_spec_str($1));
-        // Check for conflicting type specifiers
-        else if ($1 & DECL_SPEC_TYPE && $2 & DECL_SPEC_TYPE)
-            error("conflicting types ‘%s’ and ‘%s’ in declaration specifiers",
-                  decl_spec_str($1), decl_spec_str($2 & DECL_SPEC_TYPE));
-        // Check for conflicting sign specifiers
-        else if ($1 & DECL_SPEC_SIGN && $2 & DECL_SPEC_SIGN)
-            error("both ‘signed’ and ‘unsigned’ in declaration specifiers");
-        // Check for a sign specifier and a type specifier other than int
-        else if (($1 | $2) & (DECL_SPEC_TYPE & ~DECL_SPEC_INT) &&
-                 ($1 | $2) & DECL_SPEC_SIGN)
-            error("both ‘%s’ and ‘%s’ in declaration specifiers",
-                  decl_spec_str(($1 | $2) & DECL_SPEC_TYPE & ~DECL_SPEC_INT),
-                  decl_spec_str(($1 | $2) & DECL_SPEC_SIGN));
-        else
-            $$ = ($1 | $2);
+        if (_check_decl_specs(scanner, state, $1, $2))
+            $$ = $1 | $2;
+        else YYERROR;
     }
     ;
 
@@ -318,6 +303,31 @@ extern_decl
     | fn_decl
     ;
 %%
+
+// Check whether adding `spec` to `specs` results in a valid combination of
+// declaration specifiers
+static bool _check_decl_specs(yyscan_t *scanner, ParserState *state,
+                              DeclSpecs specs, DeclSpecs spec) {
+    // Check for duplicate specifiers
+    if (specs & spec)
+        error("duplicate declaration specifier ‘%s’", decl_spec_str(spec));
+    // Check for conflicting type specifiers
+    else if (specs & DECL_SPEC_TYPE && spec & DECL_SPEC_TYPE)
+        error("conflicting types ‘%s’ and ‘%s’ in declaration specifiers",
+              decl_spec_str(specs & DECL_SPEC_TYPE), decl_spec_str(spec));
+    // Check for conflicting sign specifiers
+    else if (specs & DECL_SPEC_SIGN && spec & DECL_SPEC_SIGN)
+        error("both ‘signed’ and ‘unsigned’ in declaration specifiers");
+    // Check for a sign specifier and a type specifier other than int
+    else if ((specs | spec) & (DECL_SPEC_TYPE & ~DECL_SPEC_INT) &&
+             (specs | spec) & DECL_SPEC_SIGN)
+        error("both ‘%s’ and ‘%s’ in declaration specifiers",
+              decl_spec_str((specs | spec) & DECL_SPEC_TYPE & ~DECL_SPEC_INT),
+              decl_spec_str((specs | spec) & DECL_SPEC_SIGN));
+    else
+        return true;
+    return false;
+}
 
 static void yyerror(yyscan_t *scanner, ParserState *state, const char *format,
                     ...) {
