@@ -57,12 +57,6 @@ AstNode *ast_i_const(long value) {
     return (AstNode *) node;
 }
 
-AstNode *ast_f_const(double value) {
-    _AST_MALLOC(AST_F_CONST, AstFConstNode);
-    node->value = value;
-    return (AstNode *) node;
-}
-
 AstNode *ast_fn_call(AstNode *fn, Vec *args) {
     _AST_MALLOC(AST_FN_CALL, AstFnCallNode);
     node->fn = fn;
@@ -175,8 +169,8 @@ void ast_free(AstNode *node) {
         return;
     switch (node->type) {
     case AST_IDENT:
+        break;
     case AST_I_CONST:
-    case AST_F_CONST:
         break;
     case AST_FN_CALL:
         _AST_FREE_NODE(AstFnCallNode, fn);
@@ -255,10 +249,6 @@ static void _printf(AstNode *node, int indent) {
     case AST_I_CONST:
         _AST_PRINTF_TYPE(AST_I_CONST);
         _AST_PRINTF_FIELD(AstIConstNode, value, "%ld");
-        break;
-    case AST_F_CONST:
-        _AST_PRINTF_TYPE(AST_F_CONST);
-        _AST_PRINTF_FIELD(AstFConstNode, value, "%lf");
         break;
     case AST_FN_CALL:
         _AST_PRINTF_TYPE(AST_FN_CALL);

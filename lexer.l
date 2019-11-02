@@ -11,7 +11,6 @@ OCTD [0-7]
 
 static int _symbol(YYSTYPE *lval, char *text);
 static int _i_const(YYSTYPE *lval, char *text);
-static int _f_const(YYSTYPE *lval, char *text);
 %}
 
 %option outfile="lexer.c" header-file="lexer.h"
@@ -22,7 +21,6 @@ static int _f_const(YYSTYPE *lval, char *text);
 %%
 "do"                    return DO;
 "else"                  return ELSE;
-"float"                 return FLOAT;
 "for"                   return FOR;
 "if"                    return IF;
 "int"                   return INT;
@@ -35,7 +33,6 @@ static int _f_const(YYSTYPE *lval, char *text);
 {ALPHA}{ALNUM}*         return _symbol(yylval, yytext);
 [+-]?{DECD}+            return _i_const(yylval, yytext);
 [+-]?"0"[xX]{HEXD}+     return _i_const(yylval, yytext);
-[+-]?{DECD}+"."{DECD}+  return _f_const(yylval, yytext);
 
 "++"                    return INCR_OP;
 "--"                    return DECR_OP;
@@ -82,10 +79,4 @@ static int _i_const(YYSTYPE *lval, char *text) {
     // TODO: Check result
     lval->I_CONST = ast_i_const(strtoul(text, NULL, 0));
     return I_CONST;
-}
-
-static int _f_const(YYSTYPE *lval, char *text) {
-    // TODO: Check result
-    lval->F_CONST = ast_f_const(strtod(text, NULL));
-    return F_CONST;
 }

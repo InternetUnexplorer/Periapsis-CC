@@ -6,7 +6,6 @@
 
 typedef enum TypeKind {
     TYPE_INT,
-    TYPE_FLOAT,
     TYPE_VOID,
 } TypeKind;
 

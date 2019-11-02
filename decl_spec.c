@@ -2,8 +2,6 @@
 
 const char *decl_spec_str(DeclSpecs spec) {
     switch (spec) {
-    case DECL_SPEC_FLOAT:
-        return "float";
     case DECL_SPEC_INT:
         return "int";
     case DECL_SPEC_SIGNED:

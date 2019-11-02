@@ -8,7 +8,6 @@
 typedef enum AstNodeType {
     AST_IDENT,         // Identifier
     AST_I_CONST,       // Integer constant
-    AST_F_CONST,       // Floating-point constant
     AST_FN_CALL,       // Function call
     AST_UNOP,          // Unary operation
     AST_BINOP,         // Binary operation
@@ -39,11 +38,6 @@ typedef struct AstIConstNode {
     AstNodeType type;
     long value;
 } AstIConstNode;
-
-typedef struct AstFConstNode {
-    AstNodeType type;
-    double value;
-} AstFConstNode;
 
 typedef struct AstFnCallNode {
     AstNodeType type;
@@ -129,7 +123,6 @@ typedef struct AstTransUnitNode {
 
 AstNode *ast_ident(char *ident);
 AstNode *ast_i_const(long iconst);
-AstNode *ast_f_const(double fconst);
 AstNode *ast_fn_call(AstNode *fn, Vec *args);
 AstNode *ast_unop(Unop op, AstNode *node);
 AstNode *ast_binop(Binop op, AstNode *lhs, AstNode *rhs);

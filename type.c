@@ -7,9 +7,6 @@ void type_fmt(Type type, FILE *stream) {
             fprintf(stream, "unsigned ");
         fprintf(stream, "int");
         break;
-    case TYPE_FLOAT:
-        fprintf(stream, "float");
-        break;
     case TYPE_VOID:
         fprintf(stream, "void");
         break;

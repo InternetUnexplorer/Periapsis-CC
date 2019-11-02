@@ -43,7 +43,7 @@ AstNode *parse_stdin();
 %token <AstNode*> IDENT I_CONST F_CONST
 
 %token IF ELSE WHILE DO FOR RETURN
-%token FLOAT INT SIGNED UNSIGNED VOID
+%token INT SIGNED UNSIGNED VOID
 %token INCR_OP DECR_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP
 
 %type <AstNode*> constant primary_expr postfix_expr unary_expr mult_expr
@@ -62,7 +62,6 @@ AstNode *parse_stdin();
 %%
 constant
     : I_CONST
-    | F_CONST
     ;
 
 primary_expr
@@ -177,7 +176,6 @@ decl_specs
 decl_spec
     : VOID                              { $$ = DECL_SPEC_VOID;     }
     | INT                               { $$ = DECL_SPEC_INT;      }
-    | FLOAT                             { $$ = DECL_SPEC_FLOAT;    }
     | SIGNED                            { $$ = DECL_SPEC_SIGNED;   }
     | UNSIGNED                          { $$ = DECL_SPEC_UNSIGNED; }
     ;
