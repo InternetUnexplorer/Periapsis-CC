@@ -60,6 +60,14 @@ AstNode *parse_stdin();
 %start trans_unit
 
 %%
+_push_
+    : %empty                            { /* TODO */ }
+    ;
+
+_pop_
+    : %empty                            { /* TODO */ }
+    ;
+
 constant
     : I_CONST
     ;
@@ -192,7 +200,7 @@ var_decl
 
 cmpd_stmt
     : '{' '}'                           { $$ = ast_cmpd_stmt(vec_new()); }
-    | '{' block_items '}'               { $$ = ast_cmpd_stmt($2);        }
+    | '{' _push_ block_items _pop_ '}'  { $$ = ast_cmpd_stmt($3);        }
     ;
 
 block_items
@@ -224,21 +232,21 @@ iteration_stmt
     {
         $$ = ast_do_while_stmt($2, $5);
     }
-    | FOR '(' expr_stmt expr_stmt ')' stmt
+    | FOR _push_ '(' expr_stmt expr_stmt ')' stmt _pop_
     {
-        $$ = ast_for_stmt($3, $4, ast_expr_stmt(NULL), $6);
+        $$ = ast_for_stmt($4, $5, ast_expr_stmt(NULL), $7);
     }
-    | FOR '(' expr_stmt expr_stmt expr ')' stmt
+    | FOR _push_ '(' expr_stmt expr_stmt expr ')' stmt _pop_
     {
-        $$ = ast_for_stmt($3, $4, $5, $7);
+        $$ = ast_for_stmt($4, $5, $6, $8);
     }
-    | FOR '(' decl_stmt expr_stmt ')' stmt
+    | FOR _push_ '(' decl_stmt expr_stmt ')' stmt _pop_
     {
-        $$ = ast_for_stmt($3, $4, ast_expr_stmt(NULL), $6);
+        $$ = ast_for_stmt($4, $5, ast_expr_stmt(NULL), $7);
     }
-    | FOR '(' decl_stmt expr_stmt expr ')' stmt
+    | FOR _push_ '(' decl_stmt expr_stmt expr ')' stmt _pop_
     {
-        $$ = ast_for_stmt($3, $4, $5, $7);
+        $$ = ast_for_stmt($4, $5, $6, $8);
     }
     ;
 
@@ -256,21 +264,21 @@ stmt
     ;
 
 fn_decl
-    : decl_specs IDENT '(' ')' ';'
+    : decl_specs IDENT _push_ '(' ')' _pop_ ';'
     {
         $$ = ast_fn_decl($2, vec_new(), NULL);
     }
-    | decl_specs IDENT '(' fn_params ')' ';'
+    | decl_specs IDENT _push_ '(' fn_params ')' _pop_ ';'
     {
-        $$ = ast_fn_decl($2, $4, NULL);
+        $$ = ast_fn_decl($2, $5, NULL);
     }
-    | decl_specs IDENT '(' ')' cmpd_stmt
+    | decl_specs IDENT _push_ '(' ')' cmpd_stmt _pop_
     {
-        $$ = ast_fn_decl($2, vec_new(), $5);
+        $$ = ast_fn_decl($2, vec_new(), $6);
     }
-    | decl_specs IDENT '(' fn_params ')' cmpd_stmt
+    | decl_specs IDENT _push_ '(' fn_params ')' cmpd_stmt _pop_
     {
-        $$ = ast_fn_decl($2, $4, $6);
+        $$ = ast_fn_decl($2, $5, $7);
     }
     ;
 
