@@ -1,7 +1,11 @@
-﻿---
+---
 BasedOnStyle: LLVM
-IndentWidth: '4'
-SpaceAfterCStyleCast: 'true'
 
-AllowShortFunctionsOnASingleLine: None
+AllowShortFunctionsOnASingleLine: Empty
+BreakConstructorInitializers: BeforeComma
+Cpp11BracedListStyle: false
+IncludeBlocks: Regroup
+IndentWidth: 4
+SpaceAfterCStyleCast: true
+
 ...
