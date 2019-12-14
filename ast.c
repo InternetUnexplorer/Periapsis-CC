@@ -24,9 +24,21 @@
     fprintf(stream, "%*s" #FIELD " = " FORMAT "\n", indent, "",                \
             ((TYPE *) node)->FIELD)
 
+#define _AST_FMT_FIELD_STR_FN(TYPE, FIELD, SFN)                                \
+    fprintf(stream, "%*s" #FIELD " = %s\n", STR_FN(((TYPE *) node)->FIELD))
+
+#define _AST_FMT_FIELD_FMT_FN(TYPE, FIELD, FMT_FN)                             \
+    do {                                                                       \
+        fprintf(stream, "%*s" #FIELD " = ", indent, "");                       \
+        FMT_FN(((TYPE *) node)->FIELD, stream);                                \
+        fprintf(stream, "\n");                                                 \
+    } while (0)
+
 #define _AST_FMT_NODE(TYPE, FIELD)                                             \
-    fprintf(stream, "%*s" #FIELD " = ", indent, "");                           \
-    _fmt((AstNode *) ((TYPE *) node)->FIELD, stream, indent);
+    do {                                                                       \
+        fprintf(stream, "%*s" #FIELD " = ", indent, "");                       \
+        _fmt((AstNode *) ((TYPE *) node)->FIELD, stream, indent);              \
+    } while (0)
 
 #define _AST_FMT_NODE_VEC(TYPE, FIELD)                                         \
     do {                                                                       \
@@ -80,9 +92,9 @@ AstNode *ast_binop(Binop op, AstNode *lhs, AstNode *rhs) {
     return (AstNode *) node;
 }
 
-AstNode *ast_decl_stmt(DeclSpecs specs, Vec *decls) {
+AstNode *ast_decl_stmt(Type ctype, Vec *decls) {
     _AST_MALLOC(AST_DECL_STMT, AstDeclStmtNode);
-    node->specs = specs;
+    node->ctype = ctype;
     node->decls = decls;
     return (AstNode *) node;
 }
@@ -152,9 +164,9 @@ AstNode *ast_fn_decl(AstNode *ident, Vec *params, AstNode *body) {
     return (AstNode *) node;
 }
 
-AstNode *ast_param_decl(DeclSpecs specs, AstNode *ident) {
+AstNode *ast_param_decl(Type ctype, AstNode *ident) {
     _AST_MALLOC(AST_PARAM_DECL, AstParamDeclNode);
-    node->specs = specs;
+    node->ctype = ctype;
     node->ident = ident;
     return (AstNode *) node;
 }
@@ -269,7 +281,7 @@ static void _fmt(AstNode *node, FILE *stream, int indent) {
         break;
     case AST_DECL_STMT:
         _AST_FMT_TYPE(AST_DECL_STMT);
-        _AST_FMT_FIELD(AstDeclStmtNode, specs, "0x%02X");
+        _AST_FMT_FIELD_FMT_FN(AstDeclStmtNode, ctype, type_fmt);
         _AST_FMT_NODE_VEC(AstDeclStmtNode, decls);
         break;
     case AST_VAR_DECL:
@@ -320,7 +332,7 @@ static void _fmt(AstNode *node, FILE *stream, int indent) {
         break;
     case AST_PARAM_DECL:
         _AST_FMT_TYPE(AST_PARAM_DECL);
-        _AST_FMT_FIELD(AstParamDeclNode, specs, "0x%02X");
+        _AST_FMT_FIELD_FMT_FN(AstParamDeclNode, ctype, type_fmt);
         _AST_FMT_NODE(AstParamDeclNode, ident);
         break;
     case AST_TRANS_UNIT:

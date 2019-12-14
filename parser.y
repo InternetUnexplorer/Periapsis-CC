@@ -1,6 +1,7 @@
 %{
 #include "ast.h"
 #include "decl_spec.h"
+#include "type.h"
 
 #include "parser.h"
 #include "lexer.h"
@@ -164,8 +165,16 @@ expr
     ;
 
 decl_stmt
-    : decl_specs ';'                    { $$ = ast_decl_stmt($1, vec_new()); }
-    | decl_specs var_decls ';'          { $$ = ast_decl_stmt($1, $2);        }
+    : decl_specs ';'
+    {
+        // TODO: Ensure that type is not void
+        $$ = ast_decl_stmt(type_from_specs($1), vec_new());
+    }
+    | decl_specs var_decls ';'
+    {
+        // TODO: Ensure that type is not void
+        $$ = ast_decl_stmt(type_from_specs($1), $2);
+    }
     ;
 
 decl_specs
@@ -288,8 +297,15 @@ fn_params
     ;
 
 fn_param
-    : decl_specs                        { $$ = ast_param_decl($1, NULL); }
-    | decl_specs IDENT                  { $$ = ast_param_decl($1, $2);   }
+    : decl_specs
+    {
+        $$ = ast_param_decl(type_from_specs($1), NULL); 
+    }
+    | decl_specs IDENT
+    {
+        // TODO: Ensure that type is not void
+        $$ = ast_param_decl(type_from_specs($1), $2); 
+    }
     ;
 
 trans_unit

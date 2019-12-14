@@ -3,6 +3,7 @@
 
 #include "decl_spec.h"
 #include "ops.h"
+#include "type.h"
 #include "util/vec.h"
 
 #include <stdio.h>
@@ -61,7 +62,7 @@ typedef struct AstBinopNode {
 
 typedef struct AstDeclStmtNode {
     AstNodeType type;
-    DeclSpecs specs;
+    Type ctype;
     Vec *decls;
 } AstDeclStmtNode;
 
@@ -114,7 +115,7 @@ typedef struct AstFnDeclNode {
 
 typedef struct AstParamDeclNode {
     AstNodeType type;
-    DeclSpecs specs;
+    Type ctype;
     AstNode *ident;
 } AstParamDeclNode;
 
@@ -128,7 +129,7 @@ AstNode *ast_i_const(long iconst);
 AstNode *ast_fn_call(AstNode *fn, Vec *args);
 AstNode *ast_unop(Unop op, AstNode *node);
 AstNode *ast_binop(Binop op, AstNode *lhs, AstNode *rhs);
-AstNode *ast_decl_stmt(DeclSpecs specs, Vec *decls);
+AstNode *ast_decl_stmt(Type ctype, Vec *decls);
 AstNode *ast_var_decl(AstNode *ident, AstNode *value);
 AstNode *ast_expr_stmt(AstNode *expr);
 AstNode *ast_cmpd_stmt(Vec *stmts);
@@ -139,7 +140,7 @@ AstNode *ast_for_stmt(AstNode *init_expr, AstNode *cond_expr,
                       AstNode *incr_expr, AstNode *stmt);
 AstNode *ast_return_stmt(AstNode *expr);
 AstNode *ast_fn_decl(AstNode *ident, Vec *params, AstNode *body);
-AstNode *ast_param_decl(DeclSpecs specs, AstNode *ident);
+AstNode *ast_param_decl(Type ctype, AstNode *ident);
 AstNode *ast_trans_unit(Vec *decls);
 
 void ast_free(AstNode *node);
