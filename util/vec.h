@@ -14,7 +14,6 @@
     NAME *PREFIX##_new(void);                                                  \
     NAME *PREFIX##_from(TYPE item);                                            \
     void PREFIX##_free(NAME *vec);                                             \
-    void PREFIX##_clear(NAME *vec);                                            \
     size_t PREFIX##_len(NAME *vec);                                            \
     TYPE PREFIX##_get(NAME *vec, size_t index);                                \
     void PREFIX##_set(NAME *vec, size_t index, TYPE item);                     \
@@ -27,7 +26,7 @@
 
 // Generate definitions for a vector containing items of type TYPE, where NAME
 // is the name of the vector type and PREFIX is the prefix of its methods
-// Note that this implementation requires string.h
+// Note that this implementation requires string.h and util/alloc.h
 #define VEC_DEFN(NAME, PREFIX, TYPE)                                           \
     static void _##PREFIX##_resize(NAME *vec, size_t capacity) {               \
         vec->items = checked_realloc(vec->items, capacity * sizeof(TYPE));     \
@@ -49,14 +48,7 @@
     }                                                                          \
                                                                                \
     void PREFIX##_free(NAME *vec) {                                            \
-        PREFIX##_clear(vec);                                                   \
         free(vec);                                                             \
-    }                                                                          \
-                                                                               \
-    void PREFIX##_clear(NAME *vec) {                                           \
-        while (vec->length > 0)                                                \
-            free(vec->items[--vec->length]);                                   \
-        _##PREFIX##_resize(vec, 2);                                            \
     }                                                                          \
                                                                                \
     size_t PREFIX##_len(NAME *vec) {                                           \
@@ -97,15 +89,14 @@
     }                                                                          \
                                                                                \
     TYPE PREFIX##_popf(NAME *vec) {                                            \
-        return vec->length != 0 ? PREFIX##_remove(vec, 0) : NULL;              \
+        return PREFIX##_remove(vec, 0);                                        \
     }                                                                          \
                                                                                \
     TYPE PREFIX##_popb(NAME *vec) {                                            \
-        return vec->length != 0 ? PREFIX##_remove(vec, vec->length - 1)        \
-                                : NULL;                                        \
+        return PREFIX##_remove(vec, vec->length - 1);                          \
     }
 
 // Generate declarations for the vector type `Vec` with items of type `void *`
-VEC_DECL(Vec, vec, void *);
+VEC_DECL(Vec, vec, void *)
 
 #endif
