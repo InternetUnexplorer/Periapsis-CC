@@ -1,6 +1,8 @@
 #ifndef TYPE_H
 #define TYPE_H
 
+#include "decl_spec.h"
+
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -17,6 +19,7 @@ typedef struct Type {
     } _;
 } Type;
 
+Type type_from_specs(DeclSpecs specs);
 void type_fmt(Type type, FILE *stream);
 
 #endif
