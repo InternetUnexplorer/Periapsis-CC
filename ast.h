@@ -5,6 +5,8 @@
 #include "ops.h"
 #include "util/vec.h"
 
+#include <stdio.h>
+
 typedef enum AstNodeType {
     AST_IDENT,         // Identifier
     AST_I_CONST,       // Integer constant
@@ -141,6 +143,6 @@ AstNode *ast_param_decl(DeclSpecs specs, AstNode *ident);
 AstNode *ast_trans_unit(Vec *decls);
 
 void ast_free(AstNode *node);
-void ast_printf(AstNode *node);
+void ast_fmt(AstNode *node, FILE *stream);
 
 #endif

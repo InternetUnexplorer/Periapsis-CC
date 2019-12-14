@@ -6,7 +6,7 @@
 int main() {
     AstNode *root = parse_stdin();
     if (root != NULL)
-        ast_printf(root);
+        ast_fmt(root, stdout);
 
     return !root;
 }

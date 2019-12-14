@@ -1,7 +1,6 @@
 #include "ast.h"
 #include "util/alloc.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #define _AST_MALLOC(NAME, TYPE)                                                \
@@ -18,32 +17,33 @@
         vec_free(nodes);                                                       \
     }
 
-#define _AST_PRINTF_TYPE(NAME) printf("%*stype = " #NAME "\n", indent, "")
+#define _AST_FMT_TYPE(NAME) fprintf(stream, "%*stype = " #NAME "\n", indent, "")
 
-#define _AST_PRINTF_FIELD(TYPE, FIELD, FORMAT)                                 \
-    printf("%*s" #FIELD " = " FORMAT "\n", indent, "", ((TYPE *) node)->FIELD)
+#define _AST_FMT_FIELD(TYPE, FIELD, FORMAT)                                    \
+    fprintf(stream, "%*s" #FIELD " = " FORMAT "\n", indent, "",                \
+            ((TYPE *) node)->FIELD)
 
-#define _AST_PRINTF_NODE(TYPE, FIELD)                                          \
-    printf("%*s" #FIELD " = ", indent, "");                                    \
-    _printf((AstNode *) ((TYPE *) node)->FIELD, indent);
+#define _AST_FMT_NODE(TYPE, FIELD)                                             \
+    fprintf(stream, "%*s" #FIELD " = ", indent, "");                           \
+    _fmt((AstNode *) ((TYPE *) node)->FIELD, stream, indent);
 
-#define _AST_PRINTF_NODE_VEC(TYPE, FIELD)                                      \
-    {                                                                          \
+#define _AST_FMT_NODE_VEC(TYPE, FIELD)                                         \
+    do {                                                                       \
         Vec *nodes = ((TYPE *) node)->FIELD;                                   \
         size_t nodes_len = vec_len(nodes);                                     \
         if (nodes_len == 0) {                                                  \
-            printf("%*s" #FIELD " = []\n", indent, "");                        \
+            fprintf(stream, "%*s" #FIELD " = []\n", indent, "");               \
         } else {                                                               \
-            printf("%*s" #FIELD " = [\n", indent, "");                         \
+            fprintf(stream, "%*s" #FIELD " = [\n", indent, "");                \
             indent += INDENT_SPACES;                                           \
             for (size_t i = 0; i < nodes_len; i++) {                           \
-                printf("%*s", indent, "");                                     \
-                _printf((AstNode *) vec_get(nodes, i), indent);                \
+                fprintf(stream, "%*s", indent, "");                            \
+                _fmt((AstNode *) vec_get(nodes, i), stream, indent);           \
             }                                                                  \
             indent -= INDENT_SPACES;                                           \
-            printf("%*s]\n", indent, "");                                      \
+            fprintf(stream, "%*s]\n", indent, "");                             \
         }                                                                      \
-    }
+    } while (0)
 
 AstNode *ast_ident(char *ident) {
     _AST_MALLOC(AST_IDENT, AstIdentNode);
@@ -233,107 +233,107 @@ void ast_free(AstNode *node) {
     free(node);
 }
 
-static void _printf(AstNode *node, int indent) {
+static void _fmt(AstNode *node, FILE *stream, int indent) {
     const int INDENT_SPACES = 4;
     if (node == NULL) {
-        printf("NULL\n");
+        fprintf(stream, "NULL\n");
         return;
     }
-    printf("AstNode {\n");
+    fprintf(stream, "AstNode {\n");
     indent += INDENT_SPACES;
     switch (node->type) {
     case AST_IDENT:
-        _AST_PRINTF_TYPE(AST_IDENT);
-        _AST_PRINTF_FIELD(AstIdentNode, ident, "\"%s\"");
+        _AST_FMT_TYPE(AST_IDENT);
+        _AST_FMT_FIELD(AstIdentNode, ident, "\"%s\"");
         break;
     case AST_I_CONST:
-        _AST_PRINTF_TYPE(AST_I_CONST);
-        _AST_PRINTF_FIELD(AstIConstNode, value, "%ld");
+        _AST_FMT_TYPE(AST_I_CONST);
+        _AST_FMT_FIELD(AstIConstNode, value, "%ld");
         break;
     case AST_FN_CALL:
-        _AST_PRINTF_TYPE(AST_FN_CALL);
-        _AST_PRINTF_NODE(AstFnCallNode, fn);
-        _AST_PRINTF_NODE_VEC(AstFnCallNode, args);
+        _AST_FMT_TYPE(AST_FN_CALL);
+        _AST_FMT_NODE(AstFnCallNode, fn);
+        _AST_FMT_NODE_VEC(AstFnCallNode, args);
         break;
     case AST_UNOP:
-        _AST_PRINTF_TYPE(AST_UNOP);
-        _AST_PRINTF_FIELD(AstUnopNode, op, "0x%02X");
-        _AST_PRINTF_NODE(AstUnopNode, node);
+        _AST_FMT_TYPE(AST_UNOP);
+        _AST_FMT_FIELD(AstUnopNode, op, "0x%02X");
+        _AST_FMT_NODE(AstUnopNode, node);
         break;
     case AST_BINOP:
-        _AST_PRINTF_TYPE(AST_BINOP);
-        _AST_PRINTF_FIELD(AstBinopNode, op, "0x%02X");
-        _AST_PRINTF_NODE(AstBinopNode, lhs);
-        _AST_PRINTF_NODE(AstBinopNode, rhs);
+        _AST_FMT_TYPE(AST_BINOP);
+        _AST_FMT_FIELD(AstBinopNode, op, "0x%02X");
+        _AST_FMT_NODE(AstBinopNode, lhs);
+        _AST_FMT_NODE(AstBinopNode, rhs);
         break;
     case AST_DECL_STMT:
-        _AST_PRINTF_TYPE(AST_DECL_STMT);
-        _AST_PRINTF_FIELD(AstDeclStmtNode, specs, "0x%02X");
-        _AST_PRINTF_NODE_VEC(AstDeclStmtNode, decls);
+        _AST_FMT_TYPE(AST_DECL_STMT);
+        _AST_FMT_FIELD(AstDeclStmtNode, specs, "0x%02X");
+        _AST_FMT_NODE_VEC(AstDeclStmtNode, decls);
         break;
     case AST_VAR_DECL:
-        _AST_PRINTF_TYPE(AST_VAR_DECL);
-        _AST_PRINTF_NODE(AstVarDeclNode, ident);
-        _AST_PRINTF_NODE(AstVarDeclNode, value);
+        _AST_FMT_TYPE(AST_VAR_DECL);
+        _AST_FMT_NODE(AstVarDeclNode, ident);
+        _AST_FMT_NODE(AstVarDeclNode, value);
         break;
     case AST_EXPR_STMT:
-        _AST_PRINTF_TYPE(AST_EXPR_STMT);
-        _AST_PRINTF_NODE(AstExprStmtNode, expr);
+        _AST_FMT_TYPE(AST_EXPR_STMT);
+        _AST_FMT_NODE(AstExprStmtNode, expr);
         break;
     case AST_CMPD_STMT:
-        _AST_PRINTF_TYPE(AST_CMPD_STMT);
-        _AST_PRINTF_NODE_VEC(AstCmpdStmtNode, stmts);
+        _AST_FMT_TYPE(AST_CMPD_STMT);
+        _AST_FMT_NODE_VEC(AstCmpdStmtNode, stmts);
         break;
     case AST_IF_ELSE_STMT:
-        _AST_PRINTF_TYPE(AST_IF_ELSE_STMT);
-        _AST_PRINTF_NODE(AstIfElseStmtNode, expr);
-        _AST_PRINTF_NODE(AstIfElseStmtNode, if_stmt);
-        _AST_PRINTF_NODE(AstIfElseStmtNode, else_stmt);
+        _AST_FMT_TYPE(AST_IF_ELSE_STMT);
+        _AST_FMT_NODE(AstIfElseStmtNode, expr);
+        _AST_FMT_NODE(AstIfElseStmtNode, if_stmt);
+        _AST_FMT_NODE(AstIfElseStmtNode, else_stmt);
         break;
     case AST_WHILE_STMT:
-        _AST_PRINTF_TYPE(AST_WHILE_STMT);
-        _AST_PRINTF_NODE(AstWhileStmtNode, expr);
-        _AST_PRINTF_NODE(AstWhileStmtNode, stmt);
+        _AST_FMT_TYPE(AST_WHILE_STMT);
+        _AST_FMT_NODE(AstWhileStmtNode, expr);
+        _AST_FMT_NODE(AstWhileStmtNode, stmt);
         break;
     case AST_DO_WHILE_STMT:
-        _AST_PRINTF_TYPE(AST_DO_WHILE_STMT);
-        _AST_PRINTF_NODE(AstDoWhileStmtNode, expr);
-        _AST_PRINTF_NODE(AstDoWhileStmtNode, stmt);
+        _AST_FMT_TYPE(AST_DO_WHILE_STMT);
+        _AST_FMT_NODE(AstDoWhileStmtNode, expr);
+        _AST_FMT_NODE(AstDoWhileStmtNode, stmt);
         break;
     case AST_FOR_STMT:
-        _AST_PRINTF_TYPE(AST_FOR_STMT);
-        _AST_PRINTF_NODE(AstForStmtNode, init_expr);
-        _AST_PRINTF_NODE(AstForStmtNode, cond_expr);
-        _AST_PRINTF_NODE(AstForStmtNode, incr_expr);
-        _AST_PRINTF_NODE(AstForStmtNode, stmt);
+        _AST_FMT_TYPE(AST_FOR_STMT);
+        _AST_FMT_NODE(AstForStmtNode, init_expr);
+        _AST_FMT_NODE(AstForStmtNode, cond_expr);
+        _AST_FMT_NODE(AstForStmtNode, incr_expr);
+        _AST_FMT_NODE(AstForStmtNode, stmt);
         break;
     case AST_RETURN_STMT:
-        _AST_PRINTF_TYPE(AST_RETURN_STMT);
-        _AST_PRINTF_NODE(AstReturnStmtNode, expr);
+        _AST_FMT_TYPE(AST_RETURN_STMT);
+        _AST_FMT_NODE(AstReturnStmtNode, expr);
         break;
     case AST_FN_DECL:
-        _AST_PRINTF_TYPE(AST_FN_DECL);
-        _AST_PRINTF_NODE(AstFnDeclNode, ident);
-        _AST_PRINTF_NODE_VEC(AstFnDeclNode, params);
-        _AST_PRINTF_NODE(AstFnDeclNode, body);
+        _AST_FMT_TYPE(AST_FN_DECL);
+        _AST_FMT_NODE(AstFnDeclNode, ident);
+        _AST_FMT_NODE_VEC(AstFnDeclNode, params);
+        _AST_FMT_NODE(AstFnDeclNode, body);
         break;
     case AST_PARAM_DECL:
-        _AST_PRINTF_TYPE(AST_PARAM_DECL);
-        _AST_PRINTF_FIELD(AstParamDeclNode, specs, "0x%02X");
-        _AST_PRINTF_NODE(AstParamDeclNode, ident);
+        _AST_FMT_TYPE(AST_PARAM_DECL);
+        _AST_FMT_FIELD(AstParamDeclNode, specs, "0x%02X");
+        _AST_FMT_NODE(AstParamDeclNode, ident);
         break;
     case AST_TRANS_UNIT:
-        _AST_PRINTF_TYPE(AST_TRANS_UNIT);
-        _AST_PRINTF_NODE_VEC(AstTransUnitNode, decls);
+        _AST_FMT_TYPE(AST_TRANS_UNIT);
+        _AST_FMT_NODE_VEC(AstTransUnitNode, decls);
         break;
     default:
-        _AST_PRINTF_TYPE("/* unknown */");
+        _AST_FMT_TYPE("/* unknown */");
         break;
     }
     indent -= INDENT_SPACES;
-    printf("%*s}\n", indent, "");
+    fprintf(stream, "%*s}\n", indent, "");
 }
 
-void ast_printf(AstNode *node) {
-    _printf(node, 0);
+void ast_fmt(AstNode *node, FILE *stream) {
+    _fmt(node, stream, 0);
 }
