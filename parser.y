@@ -34,7 +34,7 @@ typedef struct ParserState {
 
 typedef void *yyscan_t;
 
-AstNode *parse_stdin();
+AstNode *parse(FILE *stream);
 }
 
 %param { yyscan_t scanner }
@@ -348,18 +348,15 @@ static void yyerror(yyscan_t *scanner, ParserState *state, const char *format,
     fprintf(stderr, "\n");
 }
 
-AstNode *parse_stdin() {
-    ParserState state = {
-        .ast_root = NULL
-    };
+AstNode *parse(FILE *stream) {
+    ParserState state = { .ast_root = NULL };
 
     yyscan_t scanner;
-    if (yylex_init(&scanner))
-        return NULL;
-    if (yyparse(scanner, &state))
-        return NULL;
-
-    yylex_destroy(scanner);
+    if (!yylex_init(&scanner)) {
+        yyset_in(stream, scanner);
+        yyparse(scanner, &state);
+        yylex_destroy(scanner);
+    }
 
     return state.ast_root;
 }
